@@ -1,0 +1,141 @@
+* {
+  margin: 0px;
+}
+
+ul {
+  background-color: #453b3b;
+  color: white;
+  padding: 20px;
+  display: flex;
+  justify-content: space-between;
+  font-weight: bold;
+  font-size: 1.3rem;
+}
+
+li:nth-child(1), li:nth-child(2), li:nth-child(3), li:nth-child(4),li:nth-child(5){
+  display: inline;
+  margin: 16px;
+  list-style-type: none;
+}
+
+.range {
+  text-decoration: none;
+  font-size: 1rem;
+  width: 70px;
+}
+
+.container {
+  display: flex;
+}
+
+.editor {
+  border: 3px solid dodgerblue;
+}
+
+.compile-btn:hover {
+  background-color: #45a049;
+}
+
+.description {
+  font-size: 1.2rem;
+  flex: 60%;
+  margin: 20px;
+}
+
+.run {
+  margin-right: 10px;
+}
+
+.compile-btn {
+  color: white;
+  background-color: #45a049;
+  border: none;
+  padding: 10px;
+  border-radius: 10%;
+  cursor: pointer;
+}
+
+.test-cases {
+  color: antiquewhite;
+  background-color: #453b3b;
+  padding: 30px;
+  margin-top: 20px;
+}
+
+.cases {
+  display: flex;
+  margin-bottom: 10px;
+  margin-right: 10px;
+}
+
+.case {
+  background-color: #2f2f2f;
+  color: white;
+  padding: 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  margin:15px ;
+}
+
+.test-case-input,.test-case-output,.test-case-expected{
+  width: 100%;
+  background-color: #2f2f2f;
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 5px;
+}
+
+.app-container {
+  position: relative;
+}
+
+.form-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+}
+
+.user-form {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.user-form label {
+  display: block;
+  margin: 10px 0;
+}
+
+.user-form input {
+  width: 100%;
+  padding: 8px;
+  margin-top: 5px;
+}
+
+.user-form button {
+  margin-top: 10px;
+  padding: 10px 20px;
+  background-color: #007BFF;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.user-form button:hover {
+  background-color: #0056b3;
+}
+
+.user-data {
+  margin-top: 20px;
+}
+
