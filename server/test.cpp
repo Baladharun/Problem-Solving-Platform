@@ -1,16 +1,19 @@
 #include<iostream>
-#include<algorithm>
-using namespace std;
-class Solution {
+#include<vector>
+using namespace std;class Solution {
   public:
-    string reverseWords(string s) {
-      // Your code here
-      if(s == "a good example")
-        return "example good a";
-      else if(s == "the sky is blue")
-        return "blue is sky the";
-      else if(s == "hello world")
-        return "world hello";
-      return "baladharun";
+    int singleNumber(vector<int>& nums) {
+       int result = 0;
+       for(int i=0;i<nums.size();i++){
+        result^=nums[i];
+       }
+       return result;
     }
-  };int main(){ string s; getline(cin, s); Solution obj; string result = obj.reverseWords(s); cout << result; }
+};int main() {
+    vector<int> nums;
+ int i,n,num;
+ cin>>n; for(int i=0;i<n;i++)  { cin>>num; nums.push_back(num);}    Solution obj;
+    int result = obj.singleNumber(nums);
+    cout << result;
+    return 0;
+}
