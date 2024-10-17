@@ -9,6 +9,8 @@ const app = express();
 const url = 'mongodb://localhost:27017';
 const dbName = 'problem_solving_test';
 let db;
+var questionData;
+var questionNo;
 
 app.use(bodyParser.json());
 app.use(cors({ origin: 'http://localhost:5173' }));
@@ -31,7 +33,6 @@ app.post('/run', async (req, res) => {
 
   try {
     const { code, language,questionNo} = req.body;
-    //const questionNo = parseInt(req.query.no, 10) || 1; 
     console.log(questionNo);
     const results = await getTestData(language, code, 3, db, questionNo);
     res.status(200).json(results);
@@ -41,16 +42,15 @@ app.post('/run', async (req, res) => {
   }
 });
 
-// Route to handle the 'submit' functionality
 app.post('/submit', async (req, res) => {
   if (!db) return res.status(500).json({ error: 'Database not connected' });
-
+  
   try {
     const { code, language,questionNo} = req.body;
-    //const questionNo = parseInt(req.query.no, 10) || 1; 
-    const results = await getTestData(language, code, 50, db, questionNo);
+    const results = await getTestData(language, code, questionData[questionNo - 1].testInputs.length, db, questionNo);
     res.status(200).json(results);
-  } catch (error) {
+  } 
+  catch (error) {
     console.log(error);
     res.json(error);
   }
@@ -59,9 +59,9 @@ app.post('/submit', async (req, res) => {
 app.get('/', async (req, res) => {
   if (!db) return res.status(500).json({ error: 'Database not connected' });
 
-  const questionNumber = parseInt(req.query.no, 10) || 1;
+  questionNumber = parseInt(req.query.no, 10) || 1;
   try {
-    const questionData = await db.collection('question_set').find().toArray();
+    questionData = await db.collection('question_set').find().toArray();
     
     if (questionNumber > 0 && questionNumber <= questionData.length) {
       res.json(questionData[questionNumber - 1]); 

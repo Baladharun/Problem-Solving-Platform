@@ -5,38 +5,20 @@ import Axios from 'axios';
 import './App.css';
 
 const MainPage = () => {
-  const java_code = `class Solution {
-    public String reverseWords(String s) {
-      //Enter code here
-    }
-  }`;
-  const cpp_code = `class Solution {
-  public:
-    string reverseWords(string s) {
-      // Your code here
-    }
-  };`;
-  const c_code = `char* reverseWords(char *s) {
-    // Your code here
-  }`;
-  const py_code = `def reverseWords(s):
-    # Your code here`;
-
   const [fontSize, setFontSize] = useState(10);
   const [language, setLanguage] = useState("cpp");
   const [theme, setTheme] = useState("vs-dark");
   const [hour, setHour] = useState(1);
   const [minute, setMinute] = useState(30);
-  const [userCode, setUserCode] = useState(cpp_code);
+  const [userCode, setUserCode] = useState();
   const [testReport, setTestReport] = useState(null);
   const [questionData, setQuestionData] = useState({});
-  const [completed, setCompleted] = useState(Array(5).fill(0)); // Initialize as state
+  const [completed, setCompleted] = useState(Array(5).fill(0)); 
   const languages = ["c", "cpp", "java", "python"];
   const [testCase, setTestCase] = useState(0);
-  const [username, setUsername] = useState('');
-  const [mailId, setMailId] = useState('');
+
   const [userData, setUserData] = useState(null);
-  const [formVisible, setFormVisible] = useState(false);
+
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -47,7 +29,20 @@ const MainPage = () => {
     const fetchQuestion = async () => {
       try {
         const res = await Axios.get(`http://localhost:5174/?no=${questionNo}`);
+        console.log('sample:',res.data);
         setQuestionData(res.data || {});
+        if(language == "c"){
+          setUserCode(questionData.CStructure);
+        }
+        else if(language == "cpp"){
+          setUserCode(questionData.CppStructure);
+        }
+        else if(language == "java"){
+          setUserCode(questionData.JavaStructure);
+        }
+        else{
+          setUserCode(questionData.PythonStructure);
+        }
       } catch (error) {
         console.error('Error fetching question:', error);
         setQuestionData({ question: "Failed to load question." });
@@ -55,7 +50,7 @@ const MainPage = () => {
     };
 
     fetchQuestion();
-  }, [questionNo]);
+  }, [questionNo,language]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -136,13 +131,13 @@ const MainPage = () => {
     const selectedLanguage = e.target.value;
     setLanguage(selectedLanguage);
     if (selectedLanguage === "cpp") {
-      setUserCode(cpp_code);
+      setUserCode(questionData.CppStructure);
     } else if (selectedLanguage === "c") {
-      setUserCode(c_code);
+      setUserCode(questionData.CStructure);
     } else if (selectedLanguage === "python") {
-      setUserCode(py_code);
+      setUserCode(questionData.PythonStructure);
     } else if (selectedLanguage === "java") {
-      setUserCode(java_code);
+      setUserCode(questionData.JavaStructure);
     } else {
       setUserCode("");
     }
@@ -172,29 +167,13 @@ const MainPage = () => {
     if (testReport && testReport.success) {
       const updatedCompleted = [...completed];
       updatedCompleted[questionNo - 1] = 1;
-      setCompleted(updatedCompleted); // Update the state
+      setCompleted(updatedCompleted); 
     }
   }, [testReport, questionNo]);
 
   return (
     <div className="app-container">
-      {formVisible ? (
-        <div className="form-overlay">
-          <form onSubmit={handleUserDetailsSubmit} className="user-form">
-            <label>
-              Name:
-              <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} required />
-            </label>
-            <br />
-            <label>
-              Email:
-              <input type="email" value={mailId} onChange={(e) => setMailId(e.target.value)} required />
-            </label>
-            <br />
-            <button type="submit">Submit</button>
-          </form>
-        </div>
-      ) : (
+      
         <>
           <ul>
             <div><li>Problem Solving Certification</li></div>
@@ -251,7 +230,7 @@ const MainPage = () => {
               <button 
                 className='next-question' 
                 onClick={() => {
-                  const nextQuestionNo = (parseInt(questionNo, 10) % 2) + 1;
+                  const nextQuestionNo = (parseInt(questionNo, 10) % 3) + 1;
                   navigate(`?no=${nextQuestionNo}`);
                 }}
               >
@@ -306,16 +285,17 @@ const MainPage = () => {
               </>
             ) : (
               <>
+                
+                {testReport && testReport.compilation_error && testReport.compilation_error.runtime_error && (
+                  <div>
+                    <strong>Runtime Error:</strong>
+                    <pre>{testReport.runtime_error}</pre>
+                  </div>
+                )}
                 {testReport && testReport.compilation_error && (
                   <div>
                     <strong>Compilation Error:</strong>
                     <pre>{testReport.compilation_error}</pre>
-                  </div>
-                )}
-                {testReport && testReport.runtime_error && (
-                  <div>
-                    <strong>Runtime Error:</strong>
-                    <pre>{testReport.runtime_error}</pre>
                   </div>
                 )}
                 {testReport && testReport.success && (
@@ -327,7 +307,7 @@ const MainPage = () => {
             )}
           </div>
         </>
-      )}
+      
     </div>
   );
 };

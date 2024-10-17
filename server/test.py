@@ -1,4 +1,3 @@
-
 def reverseWords(s):
     length = len(s)
     word_positions = []  
@@ -10,7 +9,7 @@ def reverseWords(s):
             # Skip leading spaces
         while i < length and s[i] == ' ':
             i += 1
-        if i == length
+        if i == length:
             break
             
         start = i  # Start of the word
@@ -30,9 +29,8 @@ def reverseWords(s):
         result.append(word)
         
     return ' '.join(result)
-
-import sys
-for line in sys.stdin:
-    s = line.strip()
+if __name__ == "__main__":
+    s = input()
+    
     result = reverseWords(s)
     print(result)
