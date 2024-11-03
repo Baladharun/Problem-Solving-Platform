@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import MainPage from './Mainpage.jsx';
 import EvaluationPage from './EvaluationPage.jsx';
 import LoginPage from './LoginPage.jsx';
+import ProblemSet from './ProblemSet.jsx';
 
 function PrivateRoute({ isLoggedIn, children }) {
   return isLoggedIn ? children : <Navigate to="/login" />;
@@ -31,6 +32,16 @@ function App() {
       </PrivateRoute>
     } 
   />
+
+<Route 
+    path="/problemset" 
+    element={
+      
+        <ProblemSet />
+      
+    } 
+  />
+
 </Routes>
 
     </Router>
