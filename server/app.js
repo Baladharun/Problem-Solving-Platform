@@ -4,6 +4,16 @@ const bodyParser = require('body-parser');
 const { getTestData } = require('./compiler.js');
 const { addTextToImage, mailCertificate } = require('./certificate.js');
 const { MongoClient } = require('mongodb');
+const {mongoose} = require('mongoose');
+mongoose.connect('mongodb://localhost:27017/problem_solving_test', { useNewUrlParser: true, useUnifiedTopology: true });
+
+const userSchema = new mongoose.Schema({
+  emailId:String,
+  user: String,
+  password: String,
+});
+
+const User = mongoose.model('User', userSchema);
 
 const app = express();
 const url = 'mongodb://localhost:27017';
@@ -94,3 +104,43 @@ app.post('/generate-certificate', async (req, res) => {
 app.listen(5174, () => {
   console.log('Server running on http://localhost:5174');
 });
+
+app.post('/verify-login', async (req, res) => {
+  try {
+    console.log(req.body)
+    const user = await User.findOne({ emailId: req.body.emailId, password: req.body.password });
+    if (user) {
+      res.status(200).json({ success: true, message: 'login-success' });
+    } else {
+      console.log('nothing')
+      res.status(401).json({ success: false, message: 'unauthorized' });
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ success: false, message: 'server-error' });
+  }
+});
+app.post('/signup',async (req,res)=>{
+  try{
+    console.log(req.body);
+    const newUser = new User({
+      emailId:req.body.emailId,
+      user: req.body.username,
+      password: req.body.password
+    });
+    
+    newUser.save()
+      .then((doc) => {
+        console.log('Document inserted:', doc);
+        res.status(200).send('login-success')
+      })
+      .catch((err) => {
+        console.error('Error inserting document:', err);
+      });
+    
+  }
+  catch(error){
+    console.log(error)
+  }
+})
+
