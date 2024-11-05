@@ -97,7 +97,7 @@ const MainPage = () => {
     try {
       const res = await Axios.post(
         'http://localhost:5174/submit',
-        { code: userCode, language: language, testType: 'submit', questionNo: questionNo },
+        { code: userCode, language: language, testType: 'submit', questionNo: questionNo,user:localStorage.getItem("user") },
         { headers: { 'Content-Type': 'application/json' } }
       );
       console.log('Response data:', res.data);

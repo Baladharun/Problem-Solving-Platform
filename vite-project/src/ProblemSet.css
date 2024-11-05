@@ -54,3 +54,34 @@
     padding: 20px;
     box-shadow: rgba(17, 17, 26, 0.1) 0px 4px 12px, rgba(17, 17, 26, 0.1) 0px 4px 10px, rgba(17, 17, 26, 0.1) 0px 8px 20px;
 }
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: Arial, sans-serif;
+    margin-top: 50px;
+  }
+  
+  th, td {
+    padding: 10px;
+    text-align: left;
+    border: 1px solid #ddd;
+  }
+  
+  thead th {
+    background-color: #004080;
+    color: #fff;
+  }
+  
+  tbody tr:nth-child(odd) {
+    background-color: #f9f9f9; 
+  }
+  
+  tbody tr:nth-child(even) {
+    background-color: #becee1;
+  }
+  
+  tbody tr:hover {
+    background-color: #c8e1ff; 
+  }
+  

@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import Axios  from 'axios';
 import './LoginPage.css';
 
-function LoginPage({setIsLoggedIn}) {
+function LoginPage() {
   const [emailId,setEmailId] = useState('');
   const [confirmPassword,setConfirmPassword] = useState('');
   const [username, setUsername] = useState('');
@@ -17,9 +17,11 @@ function LoginPage({setIsLoggedIn}) {
         password:password,
         username:username
       },{headers:{'Content-Type' :'application/json'}});
-      if(signup.data == 'login-success');
-      setIsLoggedIn(true);
+      if(signup.data.token!=''); {
+      localStorage.setItem("user",emailId);
+      localStorage.setItem("token",signup.data.token);
       navigate('/');
+      }
     }
     catch(error){
       console.log(error);
@@ -35,7 +37,8 @@ function LoginPage({setIsLoggedIn}) {
       });
   
       if (login.data.success) {
-        setIsLoggedIn(true); 
+        localStorage.setItem("user",emailId);
+        localStorage.setItem('token',login.data.token)
         navigate('/');
       } else {
         alert('Invalid login credentials');
