@@ -5,7 +5,7 @@ import Axios from 'axios';
 import './App.css';
 
 const MainPage = () => {
-  const [fontSize, setFontSize] = useState(10);
+
   const [language, setLanguage] = useState("cpp");
   const [theme, setTheme] = useState("vs-dark");
   const [hour, setHour] = useState(1);
@@ -17,7 +17,7 @@ const MainPage = () => {
   const languages = ["c", "cpp", "java", "python"];
   const [testCase, setTestCase] = useState(0);
 
-  const [userData, setUserData] = useState(null);
+
 
 
   const navigate = useNavigate();
@@ -71,6 +71,7 @@ const MainPage = () => {
   }, [hour, minute]);
 
   const handleRun = async () => {
+    
     try {
       const res = await Axios.post(
         'http://localhost:5174/run',
@@ -91,9 +92,11 @@ const MainPage = () => {
       console.error('Error:', error);
       setTestReport(error);
     }
+    
   };
 
   const handleSubmit = async () => {
+    
     try {
       const res = await Axios.post(
         'http://localhost:5174/submit',
@@ -143,25 +146,6 @@ const MainPage = () => {
     }
   };
 
-  const handleUserDetailsSubmit = async (e) => {
-    e.preventDefault();
-    const userDetails = {
-      username,
-      mailId
-    };
-    setUserData(userDetails);
-    let sum = 0;
-    completed.forEach((element,index)=>{
-      sum += element>0?1:0;
-    })
-    await Axios.post(
-      'http://localhost:5174/generate-certificate',
-      { username: username, mailId: mailId,decision:sum},
-      { headers: { 'Content-Type': 'application/json' } }
-    );
-    setFormVisible(false); 
-    navigate('/evaluating'); // Navigate to the evaluation page
-  };
 
   useEffect(() => {
     if (testReport && testReport.success) {
@@ -176,8 +160,8 @@ const MainPage = () => {
       
         <>
           <ul>
-            <div><li>Problem Solving Certification</li></div>
-            <div>
+            <div><li>Problem Solving <em>Platform</em></li></div>
+            <div style={{display:'flex'}}>
               <li>
                 <select onChange={handleLanguageChange} value={language}>
                   {languages.map((l) => (
@@ -196,19 +180,13 @@ const MainPage = () => {
                 <span id='minute'>{minute.toString().padStart(2, '0')}</span>
               </li>
               <li>
-                <button className='compile-btn run' onClick={handleRun}>Run</button>
+                <button className='compile-btn run' onClick={handleRun} style={{marginRight:'20px'}}>Run</button>
                 <button className='compile-btn' onClick={handleSubmit}>Submit</button>
               </li>
               <li><button className='compile-btn' onClick={handleFinish}>Finish Test</button></li>
             </div>
           </ul>
-          {userData && (
-            <div className="user-data">
-              <p>User Details Submitted:</p>
-              <p>Name: {userData.username}</p>
-              <p>Email: {userData.mailId}</p>
-            </div>
-          )}
+          
           <div className='container'>
             <div className="description">
               <p>{questionData.question || "Loading question..."}</p>
@@ -239,8 +217,8 @@ const MainPage = () => {
             </div>
             <Editor
               className='editor'
-              fontSize={fontSize}
-              height="85vh"
+              fontSize='14'
+              height="100vh"
               theme={theme}
               language={language}
               value={userCode}

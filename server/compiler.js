@@ -114,7 +114,7 @@ async function compileAndRun(language, code, numTestCases) {
       fileExtension = 'cpp';
       break;
     case 'c':
-      compileCommand = ['gcc', 'test.c', '-o', 'test.exe'];
+      compileCommand = ['gcc', 'test.c', '-o', `test${uuid}.exe`];
       runCommand = ['./test.exe'];
       fileExtension = 'c';
       break;

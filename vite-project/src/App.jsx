@@ -6,7 +6,7 @@ import LoginPage from './LoginPage.jsx';
 import ProblemSet from './ProblemSet.jsx';
 
 function PrivateRoute({ children }) {
-  const token = localStorage.getItem('token'); // Check for token in localStorage
+  const token = localStorage.getItem('token'); 
   return token ? children : <Navigate to="/login" />;
 }
 
