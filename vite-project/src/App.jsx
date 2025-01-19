@@ -1,38 +1,49 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import MainPage from './Mainpage.jsx';
 import EvaluationPage from './EvaluationPage.jsx';
 import LoginPage from './LoginPage.jsx';
+import ProblemSet from './ProblemSet.jsx';
 
-function PrivateRoute({ isLoggedIn, children }) {
-  return isLoggedIn ? children : <Navigate to="/login" />;
+function PrivateRoute({ children }) {
+  const token = localStorage.getItem('token'); 
+  return token ? children : <Navigate to="/login" />;
 }
 
 function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   return (
     <Router>
       <Routes>
-  <Route path="/login" element={<LoginPage setIsLoggedIn={setIsLoggedIn} />} />
-  <Route 
-    path="/" 
-    element={
-      <PrivateRoute isLoggedIn={isLoggedIn}>
-        <MainPage />
-      </PrivateRoute>
-    } 
-  />
-  <Route 
-    path="/evaluating" 
-    element={
-      <PrivateRoute isLoggedIn={isLoggedIn}>
-        <EvaluationPage />
-      </PrivateRoute>
-    } 
-  />
-</Routes>
-
+        <Route 
+          path="/login" 
+          element={<LoginPage />} 
+        />
+        <Route 
+          path="/question" 
+          element={
+            <PrivateRoute>
+              <MainPage />
+            </PrivateRoute>
+          } 
+        />
+        <Route 
+          path="/evaluating" 
+          element={
+            <PrivateRoute>
+              <EvaluationPage />
+            </PrivateRoute>
+          } 
+        />
+        <Route 
+          path="/" 
+          element={
+            <PrivateRoute>
+              <ProblemSet />
+            </PrivateRoute>
+          } 
+        />
+      </Routes>
     </Router>
   );
 }

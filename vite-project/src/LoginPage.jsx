@@ -1,21 +1,54 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Axios  from 'axios';
 import './LoginPage.css';
 
-function LoginPage({setIsLoggedIn}) {
+function LoginPage() {
+  const [emailId,setEmailId] = useState('');
+  const [confirmPassword,setConfirmPassword] = useState('');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate(); 
   const [isLogin, setIsLogin] = useState(true);
-
-  const handleLogin = () => {
-    if (username === 'user' && password === 'password') {
-      setIsLoggedIn(true); 
-      navigate('/'); 
-    } else {
-      alert('Invalid login credentials');
+  const handleSignup = async()=>{
+    try{
+      const signup = await Axios.post('http://localhost:5174/signup',{
+        emailId:emailId,
+        password:password,
+        username:username
+      },{headers:{'Content-Type' :'application/json'}});
+      if(signup.data.token!=''); {
+      localStorage.setItem("user",emailId);
+      localStorage.setItem("token",signup.data.token);
+      navigate('/');
+      }
+    }
+    catch(error){
+      console.log(error);
+    }
+  }
+  const handleLogin = async () => {
+    try {
+      const login = await Axios.post('http://localhost:5174/verify-login', { 
+        emailId: emailId, 
+        password: password 
+      }, { 
+        headers: { 'Content-Type': 'application/json' } 
+      });
+  
+      if (login.data.success) {
+        localStorage.setItem("user",emailId);
+        localStorage.setItem('token',login.data.token)
+        navigate('/');
+      } else {
+        alert('Invalid login credentials');
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      alert('Server error');
     }
   };
+  
 
   return (
     <div className="login-container">
@@ -38,32 +71,36 @@ function LoginPage({setIsLoggedIn}) {
           <>
             <div className="get">
               <label>Enter your id</label>
-              <input type='email' value={username} onChange={(e) => setUsername(e.target.value)} />
+              <input type='email' value={emailId} onChange={(e) => setEmailId(e.target.value)} />
             </div>
             <div className="get">
               <label>Enter your Password</label>
               <input type='password' value={password} onChange={(e) => setPassword(e.target.value)} />
             </div>
-            <button onClick={handleLogin}>Log In</button>
+            <button onClick={handleLogin} className='login-btn'>Log In</button>
           </>
         ) : (
           <>
             <div className="get">
               <label>Enter your Name</label>
-              <input type='text' />
+              <input type='text' value={username} onChange={(e)=>{
+                setUsername(e.target.value);
+              }}/>
             </div>
             <div className="get">
               <label>Enter your id</label>
-              <input type='email' />
+              <input type='email' value={emailId} onChange = {(e)=>{
+                setEmailId(e.target.value);
+              }}/>
             </div>
             <div className="get">
               <label>Enter your Password</label>
-              <input type='password' />
+              <input type='password' value={password} onChange={(e)=>{setPassword(e.target.value)}}/>
             </div>
             <div className="get">
               <label>Confirm password</label>
-              <input type='password' />
-            </div>
+              <input type='password' value={confirmPassword} onChange={(e)=>{setConfirmPassword(e.target.value)}} />
+            </div><button onClick={handleSignup} className='login-btn'>Sign Up</button>
           </>
         )}
          </div>
