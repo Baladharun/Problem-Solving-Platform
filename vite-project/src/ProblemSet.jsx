@@ -39,6 +39,7 @@ const ProblemSet = () => {
             setEasy(res.data.easy);
             setMedium(res.data.medium);
             setHard(res.data.hard);
+            
         } catch (error) {
             console.error("Error loading data", error);
         }

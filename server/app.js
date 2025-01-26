@@ -10,14 +10,16 @@ const dotenv = require('dotenv');
 mongoose.connect('mongodb://localhost:27017/problem_solving_test', { useNewUrlParser: true, useUnifiedTopology: true });
 
 const userSchema = new mongoose.Schema({
-  emailId:String,
+  emailId: String,
   user: String,
   password: String,
-  solved:Array,
-  easy:Number,
-  medium:Number,
-  hard:Number
+  solved: { type: Array, default: [] },
+  easy: { type: Number, default: 0 },
+  medium: { type: Number, default: 0 },
+  hard: { type: Number, default: 0 },
+  userCode: { type: Object, default: {} },
 });
+
 
 const User = mongoose.model('User', userSchema);
 
@@ -98,8 +100,17 @@ app.post('/submit', async (req, res) => {
         userData.hard++;
         await userData.save();
       }
-      if(db.collection)
-      userData.solved.push(questionNo);
+      if(db.collection) {
+        userData.userCode = {
+          ...userData.userCode,
+          [questionNo]: {
+            ...(userData.userCode[questionNo] || {}),
+            [language]: code,
+          },
+        };
+        userData.markModified('userCode'); 
+        userData.solved.push(questionNo);
+      }
       await userData.save();
     }
     res.status(200).json(results);
@@ -175,7 +186,8 @@ app.post('/signup',async (req,res)=>{
       password: req.body.password,
       easy:0,
       medium:0,
-      hard:0
+      hard:0,
+      userCode:{}
     });
     const token = jwt.sign({emailID :req.body.emailId},process.env.SECRET_KEY,{expiresIn:'10h'});
     newUser.save()
@@ -206,8 +218,9 @@ app.post('/getTable', async (req, res) => {
     const easy = userData?userData.easy: 0;
     const medium = userData?userData.medium : 0;
     const hard = userData?userData.hard : 0;
+    const userCode = userData?userData.userCode :{}
     console.log(solvedQuestions)
-    res.send({response,solvedQuestions,easy,medium,hard});
+    res.send({response,solvedQuestions,easy,medium,hard,userCode});
   } catch (error) {
     console.log(error);
     res.status(500).send('Server Error');

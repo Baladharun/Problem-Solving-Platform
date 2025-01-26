@@ -31,7 +31,17 @@ const MainPage = () => {
         const res = await Axios.get(`http://localhost:5174/?no=${questionNo}`);
         console.log('sample:',res.data);
         setQuestionData(res.data || {});
-        if(language == "c"){
+        const response = await Axios.post('http://localhost:5174/getTable', { user:localStorage.getItem("user") });
+        if (
+          response.data.userCode && 
+          response.data.userCode[questionNo] && 
+          response.data.userCode[questionNo][language]
+        ) {
+          setUserCode(response.data.userCode[questionNo][language]);
+          console.log('hi');
+          console.log(response.data.userCode[questionNo][language])
+        }
+        else if(language == "c"){
           setUserCode(questionData.CStructure);
         }
         else if(language == "cpp"){
