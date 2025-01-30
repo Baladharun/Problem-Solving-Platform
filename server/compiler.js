@@ -106,7 +106,7 @@ function runProgram(command, args, numTestCases) {
 
 async function compileAndRun(language, code, numTestCases) {
   let compileCommand, runCommand, fileExtension;
-
+  
   switch (language) {
     case 'cpp':
       compileCommand = ['g++', 'test.cpp', '-o', 'test.exe'];
