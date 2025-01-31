@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import MainPage from './Mainpage.jsx';
+import MainPage from "./MainPage.jsx";
 import EvaluationPage from './EvaluationPage.jsx';
 import LoginPage from './LoginPage.jsx';
 import ProblemSet from './ProblemSet.jsx';

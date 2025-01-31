@@ -4,7 +4,7 @@ const { writeFileSync } = require('fs');
 let testInputs;
 let expectedOutputs;
 
-async function getTestData(language, code, numTestCases, db, questionNo) {
+async function getTestData(language, code, numTestCases, db, questionNo,user) {
   try {
     const questionData = await db.collection('question_set').find().toArray();
 
@@ -34,21 +34,21 @@ async function getTestData(language, code, numTestCases, db, questionNo) {
       code += `\n`
       code += mainFunction;
       const fullProgram = code.replace(/\\n/g, '\n');
-      return await compileAndRun(language, fullProgram, numTestCases);
+      return await compileAndRun(language, fullProgram, numTestCases,user);
     }
     const program = headers + code + mainFunction;
     const fullProgram = program.replace(/\\n/g, '\n');
-    return await compileAndRun(language, fullProgram, numTestCases);
+    return await compileAndRun(language, fullProgram, numTestCases,user);
   } 
   catch (error) {
-    console.log(error);
+    // console.log(error);
     return { compilation_error: error};
   }
 }
 
 
 
-function runProgram(command, args, numTestCases) {
+function runProgram(command, args, numTestCases,user) {
   return new Promise((resolve, reject) => {
     const inputsToUse = testInputs.slice(0, numTestCases);
     const outputsToUse = expectedOutputs.slice(0, numTestCases);
@@ -104,27 +104,27 @@ function runProgram(command, args, numTestCases) {
 }
  
 
-async function compileAndRun(language, code, numTestCases) {
+async function compileAndRun(language, code, numTestCases,user) {
   let compileCommand, runCommand, fileExtension;
-
+  
   switch (language) {
     case 'cpp':
-      compileCommand = ['g++', 'test.cpp', '-o', 'test.exe'];
-      runCommand = ['./test.exe'];
+      compileCommand = ['g++', `${user}.cpp`, '-o', `${user}.exe`];
+      runCommand = [`./${user}.exe`];
       fileExtension = 'cpp';
       break;
     case 'c':
-      compileCommand = ['gcc', 'test.c', '-o', `test${uuid}.exe`];
-      runCommand = ['./test.exe'];
+      compileCommand = ['gcc', `${user}.c`, '-o', `${user}.exe`];
+      runCommand = [`./${user}.exe`];
       fileExtension = 'c';
       break;
     case 'python':
       compileCommand = null;
-      runCommand = ['python', 'test.py'];
+      runCommand = ['python', `${user}.py`];
       fileExtension = 'py';
       break;
     case 'java':
-      compileCommand = ['javac', 'test.java'];
+      compileCommand = ['javac', `${user}.java`];
       runCommand = ['java', 'Main'];
       fileExtension = 'java';
       break;
@@ -132,7 +132,7 @@ async function compileAndRun(language, code, numTestCases) {
       throw new Error('Unsupported language');
   }
 
-  const fileName = `test.${fileExtension}`;
+  const fileName = `${user}.${fileExtension}`;
   writeFileSync(fileName, code);
 
   return new Promise((resolve, reject) => {
@@ -147,7 +147,7 @@ async function compileAndRun(language, code, numTestCases) {
       compile.on('close', async (code) => {
         if (code == 0) {
           try {
-            const results = await runProgram(runCommand[0], runCommand.slice(1), numTestCases);
+            const results = await runProgram(runCommand[0], runCommand.slice(1), numTestCases,user);
             resolve(results);
           } catch (error) {
             reject({ runtime_error: error });

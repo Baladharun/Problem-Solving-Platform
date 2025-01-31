@@ -17,9 +17,6 @@ const MainPage = () => {
   const languages = ["c", "cpp", "java", "python"];
   const [testCase, setTestCase] = useState(0);
 
-
-
-
   const navigate = useNavigate();
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
@@ -31,7 +28,17 @@ const MainPage = () => {
         const res = await Axios.get(`http://localhost:5174/?no=${questionNo}`);
         console.log('sample:',res.data);
         setQuestionData(res.data || {});
-        if(language == "c"){
+        const response = await Axios.post('http://localhost:5174/getTable', { user:localStorage.getItem("user") });
+        if (
+          response.data.userCode && 
+          response.data.userCode[questionNo] && 
+          response.data.userCode[questionNo][language]
+        ) {
+          setUserCode(response.data.userCode[questionNo][language]);
+          //console.log('hi');
+          //console.log(response.data.userCode[questionNo][language])
+        }
+        else if(language == "c"){
           setUserCode(questionData.CStructure);
         }
         else if(language == "cpp"){
@@ -75,18 +82,18 @@ const MainPage = () => {
     try {
       const res = await Axios.post(
         'http://localhost:5174/run',
-        { code: userCode, language: language, testType: 'run', questionNo: questionNo },
+        { code: userCode, language: language, testType: 'run', questionNo: questionNo, userName:localStorage.getItem("user") },
         { headers: { 'Content-Type': 'application/json' } }
       );
-      console.log('Server response:', res.data);
-
+      //console.log('Server response:', res.data);
+      console.log("Data sent to server :",localStorage.getItem("user"));
       if (res.data.compilation_error) {
         setTestReport({ compilation_error: res.data.compilation_error });
       } else if (res.data.runtime_error) {
         setTestReport({ runtime_error: res.data.runtime_error });
       } else {
         setTestReport({ test_detail: res.data.result });
-        console.log('test report:', testReport);
+        //console.log('test report:', testReport);
       }
     } catch (error) {
       console.error('Error:', error);
@@ -100,10 +107,10 @@ const MainPage = () => {
     try {
       const res = await Axios.post(
         'http://localhost:5174/submit',
-        { code: userCode, language: language, testType: 'submit', questionNo: questionNo,user:localStorage.getItem("user") },
+        { code: userCode, language: language, testType: 'submit', questionNo: questionNo,userName:localStorage.getItem("user") },
         { headers: { 'Content-Type': 'application/json' } }
       );
-      console.log('Response data:', res.data);
+      //console.log('Response data:', res.data);
 
       let report;
       if (res.data.compilation_error) {
@@ -127,7 +134,7 @@ const MainPage = () => {
 
   const handleFinish = () => {
     setFormVisible(true); 
-    console.log("Submitting code:", userCode);
+    //console.log("Submitting code:", userCode);
   };
 
   const handleLanguageChange = (e) => {
