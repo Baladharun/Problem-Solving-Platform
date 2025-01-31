@@ -7,6 +7,9 @@ const { MongoClient } = require('mongodb');
 const {mongoose} = require('mongoose');
 const jwt = require('jsonwebtoken');
 const dotenv = require('dotenv');
+const {spawn} = require('child_process')
+const path = require('path');
+const fs = require('fs');
 mongoose.connect('mongodb://localhost:27017/problem_solving_test', { useNewUrlParser: true, useUnifiedTopology: true });
 
 const userSchema = new mongoose.Schema({
@@ -49,7 +52,7 @@ async function connectToDatabase() {
   try {
     const client = await MongoClient.connect(url, { useNewUrlParser: true, useUnifiedTopology: true });
     db = client.db(dbName);
-    console.log('Connected to the database');
+    //console.log('Connected to the database');
   } catch (err) {
     console.error('Failed to connect to the database:', err);
     process.exit(1);
@@ -58,17 +61,28 @@ async function connectToDatabase() {
 
 connectToDatabase();
 
+
 app.post('/run', async (req, res) => {
   if (!db) return res.status(500).json({ error: 'Database not connected' });
-
   try {
-    const { code, language,questionNo} = req.body;
-    console.log(questionNo);
-    const results = await getTestData(language, code, 3, db, questionNo);
+    const { code, language, questionNo, userName } = req.body;
+    const results = await getTestData(language, code, 3, db, questionNo, userName);
+    const filePath = path.join(__dirname, `${userName}.${language}`);
+    if (fs.existsSync(filePath)) {
+      const deleteCommand = process.platform === "win32" ? ["cmd", "/c", "del", filePath] : ["rm", filePath];
+      const delProcess = spawn(deleteCommand[0], deleteCommand.slice(1));
+      delProcess.on("close", (code) => {
+        console.log(`File ${filePath} deleted with exit code ${code}`);
+      });
+      delProcess.on("error", (err) => {
+        console.error(`Error deleting file: ${err.message}`);
+      });
+    } else {
+      console.log(`File not found: ${filePath}`);
+    }
     res.status(200).json(results);
   } catch (error) {
-    console.log(error);
-    res.json(error);
+    res.status(500).json({ error: error.message });
   }
 });
 
@@ -76,16 +90,16 @@ app.post('/submit', async (req, res) => {
   if (!db) return res.status(500).json({ error: 'Database not connected' });
   
   try {
-    const { code, language, questionNo, user } = req.body;
-    const userData = await User.findOne({ emailId: user });
+    const { code, language, questionNo, userName } = req.body;
+    const userData = await User.findOne({ emailId: userName });
     if (!userData) {
       return res.status(404).json({ error: 'User not found' });
     }
     if (!questionData || !questionData[questionNo - 1] || !questionData[questionNo - 1].testInputs) {
       return res.status(404).json({ error: 'Question data not found' });
     }
-    const results = await getTestData(language, code, questionData[questionNo - 1].testInputs.length, db, questionNo);
-    console.log(results);
+    const results = await getTestData(language, code, questionData[questionNo - 1].testInputs.length, db, questionNo,userName);
+    ////console.log((results);
 
     if (!userData.solved.includes(questionNo) && results.success) {
       if(questionData[questionNo -1].Difficulty == "Easy") {
@@ -116,7 +130,7 @@ app.post('/submit', async (req, res) => {
     res.status(200).json(results);
   } 
   catch (error) {
-    console.log(error);
+    ////console.log((error);
     res.status(500).json({ error: 'Server error', details: error.message });
   }
 });
@@ -158,7 +172,7 @@ app.post('/generate-certificate', async (req, res) => {
 });
 
 app.listen(5174, () => {
-  console.log('Server running on http://localhost:5174');
+  //console.log('Server running on http://localhost:5174');
 });
 
 app.post('/verify-login', async (req, res) => {
@@ -173,13 +187,13 @@ app.post('/verify-login', async (req, res) => {
       res.status(401).json({ success: false, message: 'unauthorized' });
     }
   } catch (error) {
-    console.log(error);
+    //console.log(error);
     res.status(500).json({ success: false, message: 'server-error' });
   }
 });
 app.post('/signup',async (req,res)=>{
   try{
-    console.log(req.body);
+    //console.log(req.body);
     const newUser = new User({
       emailId:req.body.emailId,
       user: req.body.username,
@@ -192,7 +206,7 @@ app.post('/signup',async (req,res)=>{
     const token = jwt.sign({emailID :req.body.emailId},process.env.SECRET_KEY,{expiresIn:'10h'});
     newUser.save()
       .then((doc) => {
-        console.log('Document inserted:', doc);
+        //console.log('Document inserted:', doc);
         res.status(200).send(token);
       })
       .catch((err) => {
@@ -201,7 +215,7 @@ app.post('/signup',async (req,res)=>{
     
   }
   catch(error){
-    console.log(error)
+    //console.log(error)
   }
 });
 
@@ -219,10 +233,10 @@ app.post('/getTable', async (req, res) => {
     const medium = userData?userData.medium : 0;
     const hard = userData?userData.hard : 0;
     const userCode = userData?userData.userCode :{}
-    console.log(solvedQuestions)
+    //console.log(solvedQuestions)
     res.send({response,solvedQuestions,easy,medium,hard,userCode});
   } catch (error) {
-    console.log(error);
+    //console.log(error);
     res.status(500).send('Server Error');
   }
 });
